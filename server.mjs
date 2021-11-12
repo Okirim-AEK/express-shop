@@ -1,7 +1,9 @@
-//npm i express
-//npm i body-parser
+// 1- npm init -y
 //npm i nodemon
+//npm i express
 //npm i mongoose;
+//
+
 
 import mongoose  from 'mongoose';
 import app from './app.mjs';

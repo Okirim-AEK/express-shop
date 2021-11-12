@@ -1,5 +1,6 @@
 import express from 'express';
 import categoryRouter from './routes/category.router.mjs';
+import productRouter from './routes/product.router.mjs';
 import AppError from './exceptions/AppError.mjs';
 //(dotenv) TO GET VARIABLE ENVIRONMENT FROM THE .env FILE
 import dotenv from 'dotenv';
@@ -21,6 +22,7 @@ app.use(express.json());
 
 //routes
 app.use(categoryRouter);
+app.use(productRouter);
 //page not found
 app.all('*', (req, res, next) => next(new AppError('not found', 404)));
 //catch errors
