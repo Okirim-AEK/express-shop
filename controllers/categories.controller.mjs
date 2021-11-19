@@ -16,7 +16,7 @@ export const createCategory=CatchAsync(async (req, res,next) => {
 
 export const getCategories = CatchAsync(async (req, res, next) => {
     // get all categories from database
-    const categories = await Category.find();
+    const categories = await Category.find().populate('products');
     //send response
     res.status(200).send({
         data: categories

@@ -1,7 +1,8 @@
 import Product from '../models/Product.model.mjs';
 import AppResponse from "../responses/AppResponse.mjs";
 import CatchAsync from "../exceptions/CatchAsync.mjs";
-
+import AppError from "../exceptions/AppError.mjs";
+import validator from 'validator';
 export const getProducts = CatchAsync(async (req, res, next) => {
     //body=>req.body
     //params=>req.params
@@ -31,19 +32,36 @@ export const getProducts = CatchAsync(async (req, res, next) => {
     const filterStr = JSON.stringify(reqQueryObj).replace(/\b(lt|gt|lte|gte)\b/, (el => '$' + el));//price[$lte]=3000
     const filterObj=JSON.parse(filterStr)
     //pagination 
-    
-    const pageNumber = +page ?? 1
-    const take = +limit ?? 100
+    if (page) {
+        if(!validator.isInt(page)){
+              next(new AppError('page field should be a number',400))
+        }
+    }
+     if (limit) {
+        if(!validator.isInt(limit)){
+              next(new AppError('limit field should be a number',400))
+        }
+    }
+    let take = 100
+    let pageNumber = 1;
+    if (limit) {
+         take = limit;
+    }
+    if (page) {
+        pageNumber = page;
+    }
+  
     const skip =( pageNumber - 1) * take;
-       
-    
-
+      
     const products = await Product.find(filterObj)
         .select(selectedFields)
         .sort(sortedBy)
         .skip(skip)
         .limit(take)
-
+        // .populate({
+        //     path: 'category',
+        //     select:'name'
+        // })
     res.status(200).send(AppResponse(200,products))
  })
 
@@ -53,7 +71,7 @@ export const createProduct = CatchAsync(async (req, res, next) => {
 
     let newProduct = new Product(product);
 
-    await Product.save(newProduct);
+    await newProduct.save();
 
     res.status(201).send(AppResponse(201,newProduct))
 })
