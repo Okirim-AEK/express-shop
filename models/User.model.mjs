@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
+import argon2  from 'argon2';
 
 const userSchema = mongoose.Schema({
     username: {
@@ -42,18 +42,19 @@ const userSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
-    authTries: {
+
+    passwordShots: {
         type: Number,
         default: 0,
         max: 5
     }
 });
 
-userSchema.pre('save', function (next) {
- 
-    bcrypt.hash(this.password, 10,(err, hash) =>{
-        this.password = hash;
-});
+userSchema.pre('save', async function (next) {
+    if (this.isModified('password')) {
+        const hash = await argon2.hash(this.password);
+         this.password=hash
+   }
     next()
 })
 const User = mongoose.model('users', userSchema);
